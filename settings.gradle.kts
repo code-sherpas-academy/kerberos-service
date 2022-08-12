@@ -1,1 +1,1 @@
-rootProject.name = "kerberosservice"
+rootProject.name = "kerberos-service"
