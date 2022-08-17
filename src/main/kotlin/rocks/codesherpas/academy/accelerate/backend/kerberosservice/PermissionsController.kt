@@ -40,8 +40,13 @@ class PermissionsController(private val permissionRepository: PermissionReposito
 
     @PutMapping("/permissions/{id}")
     fun update(@RequestBody permissionResource: PermissionResource, @PathVariable("id") id: String): PermissionResourceWithId {
-        val permission = Permission(id, permissionResource.description)
-        val updatedPermission = permissionRepository.save(permission)
-        return PermissionResourceWithId(updatedPermission.id, updatedPermission.description)
+        val permission = permissionRepository.findById(id)
+        if (permission.isPresent) {
+            val updatedPermission = Permission(id, permissionResource.description)
+            val savedPermission = permissionRepository.save(updatedPermission)
+            return PermissionResourceWithId(savedPermission.id, savedPermission.description)
+        } else {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "no permission with id $id")
+        }
     }
 }
