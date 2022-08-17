@@ -1,6 +1,7 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice
 
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -46,6 +47,16 @@ class PermissionsController(private val permissionRepository: PermissionReposito
             val savedPermission = permissionRepository.save(updatedPermission)
             return PermissionResourceWithId(savedPermission.id, savedPermission.description)
         } else {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "no permission with id $id")
+        }
+    }
+
+    @DeleteMapping("/permissions/{id}")
+    fun delete(@PathVariable("id") id: String){
+        val permission = permissionRepository.findById(id)
+        if(permission.isPresent){
+            permissionRepository.deleteById(id)
+        }else{
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "no permission with id $id")
         }
     }
