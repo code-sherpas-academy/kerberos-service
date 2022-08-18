@@ -1,4 +1,4 @@
-package rocks.codesherpas.academy.accelerate.backend.kerberosservice
+package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission
 
 import org.springframework.data.jpa.repository.JpaRepository
 
