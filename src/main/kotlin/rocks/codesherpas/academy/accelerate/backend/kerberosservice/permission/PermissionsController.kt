@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.ResponseHandler
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
 import java.util.*
 
 @RestController
 class PermissionsController(
     private val permissionRepository: PermissionRepository,
-    private val responseHandler: ResponseHandler
+    private val responseHandler: ResponseHandler,
+    private val roleRepository: RoleRepository
 ) {
 
     @GetMapping("/permissions")
@@ -75,6 +77,13 @@ class PermissionsController(
         val permissionToBeDeleted = permissionRepository.findById(id)
 
         return if (permissionToBeDeleted.isPresent){
+            val roles = roleRepository.findAll()
+            roles.forEach{ role ->
+                role.permissions.removeIf{
+                    it.id == id
+                }
+            }
+            roleRepository.saveAll(roles)
             permissionRepository.deleteById(id)
             responseHandler.generateResponse("Permission with id: $id deleted successfully", HttpStatus.OK)
         } else {
