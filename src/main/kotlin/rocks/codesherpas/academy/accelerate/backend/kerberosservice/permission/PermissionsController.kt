@@ -1,4 +1,4 @@
-package rocks.codesherpas.academy.accelerate.backend.kerberosservice
+package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.ResponseHandler
 import java.util.*
 
 @RestController
 class PermissionsController(
     private val permissionRepository: PermissionRepository,
-    private val responseHandler:ResponseHandler
+    private val responseHandler: ResponseHandler
 ) {
 
     @GetMapping("/permissions")
