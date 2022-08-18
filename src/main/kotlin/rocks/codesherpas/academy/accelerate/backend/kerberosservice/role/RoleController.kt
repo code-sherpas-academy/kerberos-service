@@ -34,7 +34,8 @@ class RoleController(
         createdRole.permissions += permissions
 
         val savedRole = roleRepository.save(createdRole)
-        val roleToBeReturned = PermissionResourceWithId(savedRole.id, savedRole.description)
+        val permissionsToBeReturned = savedRole.permissions.map { PermissionResourceWithId(it.id, it.description) }
+        val roleToBeReturned = RoleResourceWithId(savedRole.id, savedRole.description, permissionsToBeReturned)
 
         return responseHandler
             .generateResponse("Role created successfully", HttpStatus.CREATED, roleToBeReturned)
@@ -64,5 +65,16 @@ class RoleController(
 
         return responseHandler
             .generateResponse("Roles successfully retrieved", HttpStatus.OK, roles)
+    }
+    @DeleteMapping("roles/{id}")
+    fun delete(@PathVariable("id") id: String): ResponseEntity<Any> {
+        val roleToBeDeleted = roleRepository.findById(id)
+
+        return if (roleToBeDeleted.isPresent){
+            roleRepository.deleteById(id)
+            responseHandler.generateResponse("Role with id: $id deleted successfully", HttpStatus.OK)
+        } else {
+            responseHandler.generateResponse("No role with id: $id", HttpStatus.NOT_FOUND)
+        }
     }
 }
