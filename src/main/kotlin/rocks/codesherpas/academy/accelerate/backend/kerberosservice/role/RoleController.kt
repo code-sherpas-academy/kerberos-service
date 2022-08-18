@@ -55,4 +55,14 @@ class RoleController(
         }
     }
 
+    @GetMapping("/roles")
+    fun getAll(): ResponseEntity<Any> {
+        val roles = roleRepository.findAll().map { role ->
+            val permissions = role.permissions.map { PermissionResourceWithId(it.id, it.description) }
+            RoleResourceWithId(role.id, role.description, permissions)
+        }
+
+        return responseHandler
+            .generateResponse("Roles successfully retrieved", HttpStatus.OK, roles)
+    }
 }
