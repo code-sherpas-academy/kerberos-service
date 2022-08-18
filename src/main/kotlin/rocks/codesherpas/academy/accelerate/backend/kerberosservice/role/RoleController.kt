@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.ResponseHandler
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionResource
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionResourceWithId
 import java.util.*
 
@@ -73,6 +74,40 @@ class RoleController(
         return if (roleToBeDeleted.isPresent){
             roleRepository.deleteById(id)
             responseHandler.generateResponse("Role with id: $id deleted successfully", HttpStatus.OK)
+        } else {
+            responseHandler.generateResponse("No role with id: $id", HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @PutMapping("/roles/{id}")
+    fun update(
+        @RequestBody roleResource: RoleResource,
+        @PathVariable("id") id: String
+    ): ResponseEntity<Any> {
+        val roleToBeUpdated = roleRepository.findById(id)
+
+        return if (roleToBeUpdated.isPresent) {
+            val updatedRole = Role(id, roleResource.description)
+
+            val permissions = roleResource.permissions.map {
+                val fetchedPermission = permissionRepository.findById(it.id)
+
+                if (fetchedPermission.isPresent) {
+                    fetchedPermission.get()
+                } else {
+                    val createdPermission = Permission(it.id, it.description)
+                    permissionRepository.save(createdPermission)
+                }
+            }
+
+            updatedRole.permissions += permissions
+
+            val savedRole = roleRepository.save(updatedRole)
+            val permissionsToBeReturned = savedRole.permissions.map { PermissionResourceWithId(it.id, it.description) }
+            val roleToBeReturned = RoleResourceWithId(savedRole.id, savedRole.description, permissionsToBeReturned)
+
+            responseHandler
+                .generateResponse("Role with id: $id updated successfully", HttpStatus.OK, roleToBeReturned)
         } else {
             responseHandler.generateResponse("No role with id: $id", HttpStatus.NOT_FOUND)
         }
