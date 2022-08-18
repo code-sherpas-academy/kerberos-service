@@ -9,66 +9,75 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-class PermissionsController(private val permissionRepository: PermissionRepository, private val responseHandler:ResponseHandler ) {
+class PermissionsController(
+    private val permissionRepository: PermissionRepository,
+    private val responseHandler:ResponseHandler
+) {
 
     @GetMapping("/permissions")
-    fun getAll(): ResponseEntity<Any?>? {
-        var permission =  permissionRepository.findAll().map { permission -> PermissionResourceWithId(permission.id, permission.description) }
+    fun getAll(): ResponseEntity<Any> {
+        val permissions = permissionRepository.findAll()
+            .map { permission -> PermissionResourceWithId(permission.id, permission.description) }
 
-        return responseHandler.generateResponse("Permissions successfully retrieved", HttpStatus.OK,  permission)
+        return responseHandler
+            .generateResponse("Permissions successfully retrieved", HttpStatus.OK, permissions)
     }
 
     @GetMapping("/permissions/{id}")
-    fun getOne(@PathVariable("id") id: String): ResponseEntity<Any?>? {
+    fun getOne(@PathVariable("id") id: String): ResponseEntity<Any> {
         val searchedPermission = permissionRepository.findById(id)
 
-        if (searchedPermission.isPresent) {
-            val permission = searchedPermission.get()
-            val retrievedPermission =  PermissionResourceWithId(permission.id, permission.description)
-            return responseHandler.generateResponse("Permission successfully retrieved", HttpStatus.OK, retrievedPermission)
+        return if (searchedPermission.isPresent) {
+            val foundPermission = searchedPermission.get()
+            val permissionToBeReturned = PermissionResourceWithId(foundPermission.id, foundPermission.description)
+            responseHandler
+                .generateResponse("Permission successfully retrieved", HttpStatus.OK, permissionToBeReturned)
         } else {
-           // throw ResponseStatusException(HttpStatus.NOT_FOUND, "no permission with id $id")
-            return  responseHandler.generateResponse("No permission with id $id", HttpStatus.NOT_FOUND,"null")
+            responseHandler.generateResponse("No permission with id: $id", HttpStatus.NOT_FOUND)
         }
     }
 
     @PostMapping("/permissions")
-    fun create(@RequestBody permissionResource: PermissionResource): ResponseEntity<Any?>? {
-        val permission = Permission(UUID.randomUUID().toString(), permissionResource.description)
-        val savedPermission = permissionRepository.save(permission)
+    fun create(@RequestBody permissionResource: PermissionResource): ResponseEntity<Any> {
+        val createdPermission = Permission(UUID.randomUUID().toString(), permissionResource.description)
+        val savedPermission = permissionRepository.save(createdPermission)
+        val permissionToBeReturned = PermissionResourceWithId(savedPermission.id, savedPermission.description)
 
-        val permissionResourceWithId =  PermissionResourceWithId(savedPermission.id, savedPermission.description)
-        return responseHandler.generateResponse("Permission created successfully", HttpStatus.CREATED, permissionResourceWithId)
+        return responseHandler
+            .generateResponse("Permission created successfully", HttpStatus.CREATED, permissionToBeReturned)
     }
 
     @PutMapping("/permissions/{id}")
-    fun update(@RequestBody permissionResource: PermissionResource, @PathVariable("id") id: String): ResponseEntity<Any?>? {
-        val permission = permissionRepository.findById(id)
-        if (permission.isPresent) {
+    fun update(
+        @RequestBody permissionResource: PermissionResource,
+        @PathVariable("id") id: String
+    ): ResponseEntity<Any> {
+        val permissionToBeUpdated = permissionRepository.findById(id)
+
+        return if (permissionToBeUpdated.isPresent) {
             val updatedPermission = Permission(id, permissionResource.description)
             val savedPermission = permissionRepository.save(updatedPermission)
-            val permissionResourceWithId  = PermissionResourceWithId(savedPermission.id, savedPermission.description)
+            val permissionToBeReturned = PermissionResourceWithId(savedPermission.id, savedPermission.description)
 
-            return responseHandler.generateResponse("Permission with id: $id updated successfully", HttpStatus.OK, permissionResourceWithId)
+            responseHandler
+                .generateResponse("Permission with id: $id updated successfully", HttpStatus.OK, permissionToBeReturned)
         } else {
-            return  responseHandler.generateResponse("No permission with id $id", HttpStatus.NOT_FOUND,"null")
-
+            responseHandler.generateResponse("No permission with id: $id", HttpStatus.NOT_FOUND)
         }
     }
 
     @DeleteMapping("/permissions/{id}")
-    fun delete(@PathVariable("id") id: String):ResponseEntity<Any?>?{
-        val permission = permissionRepository.findById(id)
-        if(permission.isPresent){
-           var result =  permissionRepository.deleteById(id)
-            return responseHandler.generateResponse("Permission Deleted Successfully", HttpStatus.OK, result )
-        }else{
-            return  responseHandler.generateResponse("No permission with id $id", HttpStatus.NOT_FOUND,"null")
+    fun delete(@PathVariable("id") id: String): ResponseEntity<Any> {
+        val permissionToBeDeleted = permissionRepository.findById(id)
 
+        return if (permissionToBeDeleted.isPresent){
+            permissionRepository.deleteById(id)
+            responseHandler.generateResponse("Permission with id: $id deleted successfully", HttpStatus.OK)
+        } else {
+            responseHandler.generateResponse("No permission with id: $id", HttpStatus.NOT_FOUND)
         }
     }
 }

@@ -7,11 +7,13 @@ import org.springframework.stereotype.Component
 @Component
 class ResponseHandler {
 
-    fun generateResponse(message: String, status: HttpStatus, responseObj: Any): ResponseEntity<Any?>? {
+    fun generateResponse(message: String, status: HttpStatus, responseObj: Any? = null): ResponseEntity<Any> {
         val map: MutableMap<String, Any> = HashMap()
+
         map["message"] = message
         map["status"] = status.value()
-        map["data"] = responseObj
+        if (responseObj != null) map["data"] = responseObj
+
         return ResponseEntity(map, status)
     }
 
