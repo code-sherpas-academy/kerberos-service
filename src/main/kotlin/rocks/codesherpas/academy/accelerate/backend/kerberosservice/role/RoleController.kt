@@ -2,9 +2,7 @@ package rocks.codesherpas.academy.accelerate.backend.kerberosservice.role
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.ResponseHandler
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
@@ -39,6 +37,22 @@ class RoleController(
         val roleToBeReturned = PermissionResourceWithId(savedRole.id, savedRole.description)
 
         return responseHandler
-            .generateResponse("Permission created successfully", HttpStatus.CREATED, roleToBeReturned)
+            .generateResponse("Role created successfully", HttpStatus.CREATED, roleToBeReturned)
     }
+
+    @GetMapping("/roles/{id}")
+    fun getOne(@PathVariable("id") id: String): ResponseEntity<Any> {
+        val searchedRole = roleRepository.findById(id)
+
+        return if (searchedRole.isPresent) {
+            val foundRole = searchedRole.get()
+            val permissions = foundRole.permissions.map { PermissionResourceWithId(it.id, it.description) }
+            val roleToBeReturned = RoleResourceWithId(foundRole.id, foundRole.description, permissions)
+            responseHandler
+                .generateResponse("Role successfully retrieved", HttpStatus.OK, roleToBeReturned)
+        } else {
+            responseHandler.generateResponse("No role with id: $id", HttpStatus.NOT_FOUND)
+        }
+    }
+
 }
