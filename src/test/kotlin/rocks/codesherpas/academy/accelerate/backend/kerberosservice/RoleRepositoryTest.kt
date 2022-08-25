@@ -56,4 +56,13 @@ class RoleRepositoryTest(@Autowired private val roleRepository: RoleRepository) 
         val savedRole = roleRepository.findById(roleToBeSaved.id).get()
         assertThat(savedRole).usingRecursiveComparison().isEqualTo(roleToBeSaved)
     }
+
+    @Test
+    fun `deletes a role by id`() {
+        assertThat(roleRepository.findById(id).isPresent).isTrue
+
+        roleRepository.deleteById(id)
+
+        assertThat(roleRepository.findById(id).isEmpty).isTrue
+    }
 }
