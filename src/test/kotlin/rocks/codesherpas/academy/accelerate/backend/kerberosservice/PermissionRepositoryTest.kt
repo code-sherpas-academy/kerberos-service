@@ -49,4 +49,16 @@ class PermissionRepositoryTest(@Autowired private val permissionRepository: Perm
         val savedPermission = permissionRepository.findById(permissionToBeSaved.id)
         assertThat(savedPermission.get()).usingRecursiveComparison().isEqualTo(permissionToBeSaved)
     }
+
+    @Test
+    fun `deletes a permission by id`() {
+        val id = "123"
+        val permission = Permission(id, "description")
+        permissionRepository.save(permission)
+        assertThat(permissionRepository.findById(id).isPresent).isTrue
+
+        permissionRepository.deleteById(id)
+
+        assertThat(permissionRepository.findById(id).isEmpty).isTrue
+    }
 }
