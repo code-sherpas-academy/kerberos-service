@@ -37,4 +37,16 @@ class PermissionRepositoryTest(@Autowired private val permissionRepository: Perm
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactlyInAnyOrderElementsOf(savedPermissions + previousPermissions)
     }
+
+    @Test
+    fun `saves a permission`() {
+        val permissionToBeSaved = Permission("123", "A permission")
+        val searchedPermission = permissionRepository.findById(permissionToBeSaved.id)
+        assertThat(searchedPermission.isEmpty).isTrue
+
+        permissionRepository.save(permissionToBeSaved)
+
+        val savedPermission = permissionRepository.findById(permissionToBeSaved.id)
+        assertThat(savedPermission.get()).usingRecursiveComparison().isEqualTo(permissionToBeSaved)
+    }
 }
