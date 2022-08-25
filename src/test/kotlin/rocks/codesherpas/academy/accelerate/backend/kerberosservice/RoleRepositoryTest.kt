@@ -26,4 +26,22 @@ class RoleRepositoryTest(@Autowired private val roleRepository: RoleRepository) 
 
         assertThat(retrievedRole.get()).usingRecursiveComparison().isEqualTo(role)
     }
+
+    @Test
+    fun `finds all roles`() {
+        val previousRoles = roleRepository.findAll()
+
+        val savedRoles = listOf(
+            Role("1", "Role 1"),
+            Role("2", "Role 2")
+        )
+
+        roleRepository.saveAll(savedRoles)
+
+        val retrievedRoles = roleRepository.findAll()
+
+        assertThat(retrievedRoles)
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactlyInAnyOrderElementsOf(previousRoles + savedRoles)
+    }
 }
