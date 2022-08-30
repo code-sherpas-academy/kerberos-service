@@ -1,6 +1,6 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissionct
 
-import com.google.gson.Gson
+import com.google.gson.JsonParser
 import io.restassured.RestAssured
 import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
@@ -9,60 +9,48 @@ import io.restassured.module.kotlin.extensions.When
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionResourceWithId
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class GetSinglePermissionCT {
-
-    @LocalServerPort
-    val port:Int = 0
+class GetSinglePermissionCT(
+    @Autowired val permissionRepository: PermissionRepository,
+    @LocalServerPort val port: Int
+) {
 
     private val description = "This is a permission"
-
-    private val postRequestBody = """
+    private val permissionId = "123"
+    private val expectedJson = """
         {
-            "description":"$description"
+            "id": "$permissionId",
+            "description": "$description"
         }
     """.trimIndent()
-
-    private lateinit var savedPermissionId: String
 
     @BeforeEach
     fun setUp() {
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
-        Given {
-            contentType("application/json")
-            body(postRequestBody)
-        } When {
-            post("/permissions")
-        } Extract {
-            val responseBody = Gson().fromJson(body().asString(), PermissionResponse::class.java)
-            savedPermissionId = responseBody.data.id
-        }
+        permissionRepository.save(Permission(permissionId, description))
     }
 
     @Test
     fun getSinglePermission() {
         Given {
-            contentType("application/json")
+            pathParam("id", permissionId)
         } When {
-            get("/permissions/$savedPermissionId")
+            get("/permissions/{id}")
         } Then {
             statusCode(200)
+            contentType("application/json")
         } Extract {
-            val responseBody = Gson().fromJson(body().asString(), PermissionResponse::class.java)
-            assertThat(responseBody.data.id).isEqualTo(savedPermissionId)
-            assertThat(responseBody.data.description).isEqualTo(description)
+            val responseBody = JsonParser.parseString(body().asString())
+            val expectedBody = JsonParser.parseString(expectedJson)
+            assertThat(responseBody).isEqualTo(expectedBody)
         }
     }
 }
-
-data class PermissionResponse(
-    val message: String,
-    val status: Int,
-    val data: PermissionResourceWithId
-)
