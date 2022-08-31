@@ -29,6 +29,9 @@ dependencies {
 	testImplementation("io.rest-assured:xml-path:5.1.1")
 	testImplementation("io.rest-assured:json-path:5.1.1")
 	testImplementation("io.rest-assured:kotlin-extensions:5.1.1")
+	testImplementation("io.rest-assured:json-schema-validator:5.1.1")
+	testImplementation("io.rest-assured:spring-mock-mvc:5.1.1")
+	testImplementation("io.mockk:mockk:1.12.7")
 	testImplementation("com.google.code.gson:gson:2.9.1")
 
 }

@@ -1,82 +1,72 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission
 
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.ResponseHandler
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
 import java.util.*
 
 @RestController
 class PermissionsController(
     private val permissionRepository: PermissionRepository,
-    private val responseHandler: ResponseHandler,
     private val roleRepository: RoleRepository
 ) {
 
     @GetMapping("/permissions")
-    fun getAll(): ResponseEntity<Any> {
-        val permissions = permissionRepository.findAll()
+    fun getAll(): List<PermissionResourceWithId> {
+        return permissionRepository.findAll()
             .map { permission -> PermissionResourceWithId(permission.id, permission.description) }
-
-        return responseHandler
-            .generateResponse("Permissions successfully retrieved", HttpStatus.OK, permissions)
     }
 
     @GetMapping("/permissions/{id}")
-    fun getOne(@PathVariable("id") id: String): ResponseEntity<Any> {
+    fun getOne(@PathVariable("id") id: String): PermissionResourceWithId {
         val searchedPermission = permissionRepository.findById(id)
 
         return if (searchedPermission.isPresent) {
             val foundPermission = searchedPermission.get()
-            val permissionToBeReturned = PermissionResourceWithId(foundPermission.id, foundPermission.description)
-            responseHandler
-                .generateResponse("Permission successfully retrieved", HttpStatus.OK, permissionToBeReturned)
+            PermissionResourceWithId(foundPermission.id, foundPermission.description)
         } else {
-            responseHandler.generateResponse("No permission with id: $id", HttpStatus.NOT_FOUND)
+            throw Exception("No permission with id: $id")
+            // throw http exception ("No permission with id: $id", HttpStatus.NOT_FOUND)
         }
     }
 
     @PostMapping("/permissions")
-    fun create(@RequestBody permissionResource: PermissionResource): ResponseEntity<Any> {
+    @ResponseStatus(HttpStatus.CREATED)
+    fun create(@RequestBody permissionResource: PermissionResource): PermissionResourceWithId {
         val createdPermission = Permission(UUID.randomUUID().toString(), permissionResource.description)
         val savedPermission = permissionRepository.save(createdPermission)
-        val permissionToBeReturned = PermissionResourceWithId(savedPermission.id, savedPermission.description)
-
-        return responseHandler
-            .generateResponse("Permission created successfully", HttpStatus.CREATED, permissionToBeReturned)
+        return PermissionResourceWithId(savedPermission.id, savedPermission.description)
     }
 
     @PutMapping("/permissions/{id}")
     fun update(
         @RequestBody permissionResource: PermissionResource,
         @PathVariable("id") id: String
-    ): ResponseEntity<Any> {
+    ): PermissionResourceWithId {
         val permissionToBeUpdated = permissionRepository.findById(id)
 
         return if (permissionToBeUpdated.isPresent) {
             val updatedPermission = Permission(id, permissionResource.description)
             val savedPermission = permissionRepository.save(updatedPermission)
-            val permissionToBeReturned = PermissionResourceWithId(savedPermission.id, savedPermission.description)
-
-            responseHandler
-                .generateResponse("Permission with id: $id updated successfully", HttpStatus.OK, permissionToBeReturned)
+            PermissionResourceWithId(savedPermission.id, savedPermission.description)
         } else {
-            responseHandler.generateResponse("No permission with id: $id", HttpStatus.NOT_FOUND)
+            throw Exception("No permission with id: $id")
+            // throw http exception ("No permission with id: $id", HttpStatus.NOT_FOUND)
         }
     }
 
     @DeleteMapping("/permissions/{id}")
-    fun delete(@PathVariable("id") id: String): ResponseEntity<Any> {
+    fun delete(@PathVariable("id") id: String) {
         val permissionToBeDeleted = permissionRepository.findById(id)
 
-        return if (permissionToBeDeleted.isPresent){
+        if (permissionToBeDeleted.isPresent){
             val roles = roleRepository.findAll()
             roles.forEach{ role ->
                 role.permissions.removeIf{
@@ -85,9 +75,9 @@ class PermissionsController(
             }
             roleRepository.saveAll(roles)
             permissionRepository.deleteById(id)
-            responseHandler.generateResponse("Permission with id: $id deleted successfully", HttpStatus.OK)
         } else {
-            responseHandler.generateResponse("No permission with id: $id", HttpStatus.NOT_FOUND)
+            throw Exception("No permission with id: $id")
+            // throw http exception ("No permission with id: $id", HttpStatus.NOT_FOUND)
         }
     }
 }

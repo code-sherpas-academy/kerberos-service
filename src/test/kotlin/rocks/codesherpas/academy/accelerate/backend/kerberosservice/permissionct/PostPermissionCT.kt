@@ -1,6 +1,8 @@
-package rocks.codesherpas.academy.accelerate.backend.kerberosservice
+package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissionct
 
 import com.google.gson.JsonParser
+import io.mockk.every
+import io.mockk.mockkStatic
 import io.restassured.RestAssured
 import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
@@ -11,18 +13,20 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PostPermissionCT {
 
     @LocalServerPort
     val port:Int = 0
+
+    private final val uuid: UUID = UUID.randomUUID()
+
     val expectedJson = """
         {
-            "data": {
-                "id": null,
-                "description": "This is a post permission"
-            } 
+            "id": "$uuid",
+            "description": "This is a post permission"
         }
     """.trimIndent()
 
@@ -32,30 +36,28 @@ class PostPermissionCT {
         }
     """.trimIndent()
 
-
     @BeforeEach
     fun setUp(){
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
     }
 
-
     @Test
     fun createPermission(){
+        mockkStatic(UUID::class)
+        every { UUID.randomUUID() } returns uuid
+
         Given {
-                contentType("application/json")
-                body(requestBody)
-        }When{
-                post("/permissions")
-
-        }Then{
+            contentType("application/json")
+            body(requestBody)
+        } When {
+            post("/permissions")
+        } Then {
             statusCode(201)
-
-        }Extract{
+        } Extract {
             val responseBody = JsonParser.parseString(body().asString())
             val expectedBody = JsonParser.parseString(expectedJson)
-            //assertThat(responseBody).isEqualTo(expectedBody)
+            assertThat(responseBody).isEqualTo(expectedBody)
         }
     }
-
 }
