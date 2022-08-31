@@ -1,5 +1,6 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.role
 
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
@@ -13,6 +14,7 @@ class RoleController(
 ) {
 
     @PostMapping("/roles")
+    @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody roleResource: RoleResource): RoleResourceWithId {
         val createdRole = Role(UUID.randomUUID().toString(), roleResource.description)
 
