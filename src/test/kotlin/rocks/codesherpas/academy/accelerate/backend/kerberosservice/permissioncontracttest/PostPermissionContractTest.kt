@@ -1,5 +1,7 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissioncontracttest
 
+import io.mockk.every
+import io.mockk.mockkStatic
 import io.restassured.RestAssured
 import io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath
 import io.restassured.module.mockmvc.RestAssuredMockMvc.*
@@ -16,11 +18,18 @@ import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.P
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
 import java.util.*
 
+
 @WebMvcTest
-class GetSinglePermissionContractTest(@Autowired val mockMvc: MockMvc) {
+class PostPermissionContractTest(@Autowired val mockMvc: MockMvc) {
 
     @MockBean lateinit var permissionRepository: PermissionRepository
     @MockBean lateinit var roleRepository: RoleRepository
+
+    private val requestBody = """
+        {
+            "description": "Permission description"
+        }
+    """.trimIndent()
 
     @BeforeEach
     fun setUp() {
@@ -28,19 +37,19 @@ class GetSinglePermissionContractTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun getSinglePermission() {
-        val permissionId = "123"
-
-        `when`(permissionRepository.findById(permissionId))
-            .thenReturn(Optional.of(Permission(permissionId, "description")))
+    fun createPermission() {
+        `when`(permissionRepository.save(any(Permission::class.java)))
+            .thenAnswer { i -> i.arguments[0] }
 
         given()
             .mockMvc(mockMvc)
             .standaloneSetup(PermissionsController(permissionRepository, roleRepository))
+            .contentType("application/json")
+            .body(requestBody)
         .`when`()
-            .get("/permissions/{id}", permissionId)
+            .post("/permissions")
         .then()
-            .statusCode(200)
+            .statusCode(201)
             .contentType("application/json")
             .assertThat().body(matchesJsonSchemaInClasspath("singlePermissionContract.json"))
     }
