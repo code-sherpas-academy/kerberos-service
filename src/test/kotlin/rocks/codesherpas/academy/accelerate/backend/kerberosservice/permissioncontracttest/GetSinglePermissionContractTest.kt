@@ -1,4 +1,4 @@
-package rocks.codesherpas.academy.accelerate.backend.kerberosservice
+package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissioncontracttest
 
 import io.restassured.RestAssured
 import io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath
