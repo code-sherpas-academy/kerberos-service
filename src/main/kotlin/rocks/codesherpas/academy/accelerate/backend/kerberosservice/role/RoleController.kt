@@ -59,6 +59,7 @@ class RoleController(
     }
 
     @DeleteMapping("roles/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable("id") id: String) {
         val roleToBeDeleted = roleRepository.findById(id)
 
