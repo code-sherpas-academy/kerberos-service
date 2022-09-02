@@ -63,6 +63,7 @@ class PermissionsController(
     }
 
     @DeleteMapping("/permissions/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable("id") id: String) {
         val permissionToBeDeleted = permissionRepository.findById(id)
 
