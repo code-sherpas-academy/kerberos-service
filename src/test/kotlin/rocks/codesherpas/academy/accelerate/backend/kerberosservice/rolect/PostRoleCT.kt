@@ -9,16 +9,19 @@ import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
 import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PostRoleCT(
-    @LocalServerPort
-    val port:Int
+    @LocalServerPort val port:Int,
+    @Autowired val roleRepository: RoleRepository
 ) {
 
     private final val uuid: UUID = UUID.randomUUID()
@@ -42,6 +45,13 @@ class PostRoleCT(
     fun setUp(){
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
+
+        roleRepository.deleteAll()
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        roleRepository.deleteAll()
     }
 
     @Test

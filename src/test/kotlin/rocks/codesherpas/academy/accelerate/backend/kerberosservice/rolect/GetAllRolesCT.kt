@@ -3,16 +3,15 @@ package rocks.codesherpas.academy.accelerate.backend.kerberosservice.rolect
 import com.google.gson.JsonParser
 import io.restassured.RestAssured
 import io.restassured.module.kotlin.extensions.Extract
-import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
@@ -49,8 +48,15 @@ class GetAllRolesCT(
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
+        roleRepository.deleteAll()
+
         val roles = listOf(Role(roleId1, roleDescription1), Role(roleId2, roleDescription2))
         roleRepository.saveAll(roles)
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        roleRepository.deleteAll()
     }
 
     @Test
