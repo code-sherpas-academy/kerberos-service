@@ -1,12 +1,9 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissionct
 
-import com.google.gson.JsonParser
 import io.restassured.RestAssured
-import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,7 +34,7 @@ class DeletePermissionCT(
         } When {
             delete("/permissions/{id}")
         } Then {
-            statusCode(200)
+            statusCode(204)
         }
 
         Given {
