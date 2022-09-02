@@ -1,11 +1,10 @@
-package rocks.codesherpas.academy.accelerate.backend.kerberosservice
+package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissioncontracttest
 
 import io.restassured.RestAssured
-import io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath
-import io.restassured.module.mockmvc.RestAssuredMockMvc.*
+import io.restassured.module.mockmvc.RestAssuredMockMvc
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -17,10 +16,12 @@ import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRep
 import java.util.*
 
 @WebMvcTest
-class GetSinglePermissionContractTest(@Autowired val mockMvc: MockMvc) {
+class DeletePermissionsContractTest(@Autowired val mockMvc: MockMvc) {
 
-    @MockBean lateinit var permissionRepository: PermissionRepository
-    @MockBean lateinit var roleRepository: RoleRepository
+    @MockBean
+    lateinit var permissionRepository: PermissionRepository
+    @MockBean
+    lateinit var roleRepository: RoleRepository
 
     @BeforeEach
     fun setUp() {
@@ -28,20 +29,18 @@ class GetSinglePermissionContractTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun getSinglePermission() {
+    fun deletePermission() {
         val permissionId = "123"
 
-        `when`(permissionRepository.findById(permissionId))
+        Mockito.`when`(permissionRepository.findById(permissionId))
             .thenReturn(Optional.of(Permission(permissionId, "description")))
 
-        given()
+        RestAssuredMockMvc.given()
             .mockMvc(mockMvc)
             .standaloneSetup(PermissionsController(permissionRepository, roleRepository))
-        .`when`()
-            .get("/permissions/{id}", permissionId)
-        .then()
+            .`when`()
+            .delete("/permissions/{id}", permissionId)
+            .then()
             .statusCode(200)
-            .contentType("application/json")
-            .assertThat().body(matchesJsonSchemaInClasspath("getSinglePermissionContract.json"))
     }
 }
