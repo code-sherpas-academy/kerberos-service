@@ -25,19 +25,20 @@ class PostRoleCT(
 ) {
 
     private final val uuid: UUID = UUID.randomUUID()
+    private val description = "This is a post role"
 
     val expectedJson = """
         {
             "id": "$uuid",
-            "description": "This is a post role",
-            "permissions":[]
+            "description": "$description",
+            "permissions": []
         }
     """.trimIndent()
 
     var requestBody:String = """
         {
-            "description":"This is a post role",
-            "permissions":[]
+            "description": "$description",
+            "permissions": []
         }
     """.trimIndent()
 

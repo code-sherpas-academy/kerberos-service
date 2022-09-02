@@ -4,6 +4,7 @@ import io.restassured.RestAssured
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,16 +44,9 @@ class DeleteRoleCT(
         } When {
             delete("/roles/{id}")
         } Then {
-            statusCode(200)
+            statusCode(204)
         }
 
-        Given {
-            pathParam("id", roleId)
-        } When {
-            get("/roles/{id}")
-        } Then {
-            // This should be changed to 404 when error handling is resolved
-            statusCode(500)
-        }
+        Assertions.assertThat(roleRepository.existsById(roleId)).isFalse
     }
 }
