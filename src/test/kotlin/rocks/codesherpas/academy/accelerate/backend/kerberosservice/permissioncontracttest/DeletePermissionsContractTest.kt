@@ -38,9 +38,9 @@ class DeletePermissionsContractTest(@Autowired val mockMvc: MockMvc) {
         RestAssuredMockMvc.given()
             .mockMvc(mockMvc)
             .standaloneSetup(PermissionsController(permissionRepository, roleRepository))
-            .`when`()
+        .`when`()
             .delete("/permissions/{id}", permissionId)
-            .then()
-            .statusCode(200)
+        .then()
+            .statusCode(204)
     }
 }

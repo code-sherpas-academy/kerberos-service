@@ -1,8 +1,6 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissionct
 
-import com.google.gson.JsonParser
 import io.restassured.RestAssured
-import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
@@ -37,16 +35,9 @@ class DeletePermissionCT(
         } When {
             delete("/permissions/{id}")
         } Then {
-            statusCode(200)
+            statusCode(204)
         }
 
-        Given {
-            pathParam("id", permissionId)
-        } When {
-            get("/permissions/{id}")
-        } Then {
-            // This should be changed to 404 when error handling is resolved
-            statusCode(500)
-        }
+        Assertions.assertThat(permissionRepository.existsById(permissionId)).isFalse
     }
 }
