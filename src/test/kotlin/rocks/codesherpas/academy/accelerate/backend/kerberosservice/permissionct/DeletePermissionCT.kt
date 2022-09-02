@@ -4,6 +4,7 @@ import io.restassured.RestAssured
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,13 +38,6 @@ class DeletePermissionCT(
             statusCode(204)
         }
 
-        Given {
-            pathParam("id", permissionId)
-        } When {
-            get("/permissions/{id}")
-        } Then {
-            // This should be changed to 404 when error handling is resolved
-            statusCode(500)
-        }
+        Assertions.assertThat(permissionRepository.existsById(permissionId)).isFalse
     }
 }
