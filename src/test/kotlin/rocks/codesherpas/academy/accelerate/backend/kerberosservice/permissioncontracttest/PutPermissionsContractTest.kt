@@ -42,16 +42,16 @@ class PutPermissionsContractTest(@Autowired val mockMvc: MockMvc) {
             .thenReturn(Optional.of(Permission(permissionId, "description")))
 
         Mockito.`when`(permissionRepository.save(Mockito.any(Permission::class.java)))
-            .thenAnswer { i -> i.arguments[0] }
+            .thenAnswer { invocation -> invocation.arguments[0] }
 
         RestAssuredMockMvc.given()
             .contentType("application/json")
             .body(updatedPermission)
             .mockMvc(mockMvc)
             .standaloneSetup(PermissionsController(permissionRepository, roleRepository))
-            .`when`()
+        .`when`()
             .put("/permissions/{id}", permissionId)
-            .then()
+        .then()
             .statusCode(200)
             .contentType("application/json")
             .assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("singlePermissionContract.json"))

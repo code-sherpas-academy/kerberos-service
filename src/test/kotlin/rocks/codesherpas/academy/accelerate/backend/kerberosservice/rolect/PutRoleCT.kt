@@ -7,6 +7,7 @@ import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,7 +38,14 @@ class PutRoleCT(
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
+        roleRepository.deleteAll()
+
         roleRepository.save(Role(roleId, "Initial description"))
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        roleRepository.deleteAll()
     }
 
     @Test

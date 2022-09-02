@@ -1,13 +1,12 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permissioncontracttest
 
-import io.mockk.every
-import io.mockk.mockkStatic
 import io.restassured.RestAssured
 import io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath
-import io.restassured.module.mockmvc.RestAssuredMockMvc.*
+import io.restassured.module.mockmvc.RestAssuredMockMvc.given
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.any
+import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -16,7 +15,6 @@ import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.P
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionsController
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
-import java.util.*
 
 
 @WebMvcTest
@@ -39,7 +37,7 @@ class PostPermissionContractTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun createPermission() {
         `when`(permissionRepository.save(any(Permission::class.java)))
-            .thenAnswer { i -> i.arguments[0] }
+            .thenAnswer { invocation -> invocation.arguments[0] }
 
         given()
             .mockMvc(mockMvc)
