@@ -6,6 +6,7 @@ import io.restassured.module.kotlin.extensions.Extract
 import io.restassured.module.kotlin.extensions.Then
 import io.restassured.module.kotlin.extensions.When
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,33 +27,31 @@ class GetAllPermissionsCT(
     private val description2 = "This is another permission"
     private val permissionId2 = "1234"
 
-    private var expectedJson = ""
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
-
-        val previousPermissions = permissionRepository.findAll()
-        expectedJson += '['
-        previousPermissions.forEach{
-            if (expectedJson.last() == '}') expectedJson += ','
-            expectedJson += """{
-                "id": "${it.id}",
-                "description": "${it.description}"
-            }""".trimIndent()
-        }
-        if (expectedJson.last() == '}') expectedJson += ','
-        expectedJson += """{
+    private val expectedJson = """[
+            {
                 "id": "$permissionId1",
                 "description": "$description1"
             },
             {
                 "id": "$permissionId2",
                 "description": "$description2"
-            }]""".trimIndent()
+            }
+        ]""".trimIndent()
+
+    @BeforeEach
+    fun setUp() {
+        RestAssured.port = port
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
+
+        permissionRepository.deleteAll()
+
         val permissions = listOf(Permission(permissionId1, description1), Permission(permissionId2, description2))
         permissionRepository.saveAll(permissions)
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        permissionRepository.deleteAll()
     }
 
     @Test
