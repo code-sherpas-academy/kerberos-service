@@ -16,12 +16,19 @@ import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleCon
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
 
 @WebMvcTest
-class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
+class PostRoleContractTest(@Autowired val mockMvc: MockMvc) {
 
     @MockBean
     lateinit var permissionRepository: PermissionRepository
     @MockBean
     lateinit var roleRepository: RoleRepository
+
+    private val requestBody = """
+        {
+            "description": "Role description",
+            "permissions" : []
+        }
+    """.trimIndent()
 
     @BeforeEach
     fun setUp() {
@@ -29,21 +36,20 @@ class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun getAllRoles() {
-        Mockito.`when`(roleRepository.findAll())
-            .thenReturn(listOf(
-                Role("123", "description1"),
-                Role("345", "description2")
-            ))
+    fun createRole() {
+        Mockito.`when`(roleRepository.save(Mockito.any(Role::class.java)))
+            .thenAnswer { invocation -> invocation.arguments[0] }
 
         RestAssuredMockMvc.given()
             .mockMvc(mockMvc)
             .standaloneSetup(RoleController(roleRepository, permissionRepository))
-            .`when`()
-            .get("/roles/")
-            .then()
-            .statusCode(200)
             .contentType("application/json")
-            .assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("getAllRolesContract.json"))
+            .body(requestBody)
+            .`when`()
+            .post("/roles")
+            .then()
+            .statusCode(201)
+            .contentType("application/json")
+            .assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("singleRoleContract.json"))
     }
 }

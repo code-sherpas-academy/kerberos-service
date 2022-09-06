@@ -1,7 +1,6 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.rolescontratcttest
 
 import io.restassured.RestAssured
-import io.restassured.module.jsv.JsonSchemaValidator
 import io.restassured.module.mockmvc.RestAssuredMockMvc
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,9 +13,10 @@ import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.P
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleController
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import java.util.*
 
 @WebMvcTest
-class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
+class DeleteRoleContractTest(@Autowired val mockMvc: MockMvc) {
 
     @MockBean
     lateinit var permissionRepository: PermissionRepository
@@ -29,21 +29,18 @@ class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun getAllRoles() {
-        Mockito.`when`(roleRepository.findAll())
-            .thenReturn(listOf(
-                Role("123", "description1"),
-                Role("345", "description2")
-            ))
+    fun deleteRole() {
+        val roleId = "123"
+
+        Mockito.`when`(roleRepository.findById(roleId))
+            .thenReturn(Optional.of(Role(roleId, "description")))
 
         RestAssuredMockMvc.given()
             .mockMvc(mockMvc)
             .standaloneSetup(RoleController(roleRepository, permissionRepository))
             .`when`()
-            .get("/roles/")
+            .delete("/roles/{id}", roleId)
             .then()
-            .statusCode(200)
-            .contentType("application/json")
-            .assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("getAllRolesContract.json"))
+            .statusCode(204)
     }
 }

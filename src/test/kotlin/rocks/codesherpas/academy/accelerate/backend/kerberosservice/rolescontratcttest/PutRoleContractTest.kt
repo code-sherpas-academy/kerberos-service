@@ -14,9 +14,10 @@ import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.P
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleController
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import java.util.*
 
 @WebMvcTest
-class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
+class PutRoleContractTest(@Autowired val mockMvc: MockMvc) {
 
     @MockBean
     lateinit var permissionRepository: PermissionRepository
@@ -29,21 +30,31 @@ class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun getAllRoles() {
-        Mockito.`when`(roleRepository.findAll())
-            .thenReturn(listOf(
-                Role("123", "description1"),
-                Role("345", "description2")
-            ))
+    fun putRole() {
+        val updatedRole = """
+            {
+                "description": "A new role",
+                "permissions": []
+            }
+        """.trimIndent()
+        val roleId = "123"
+
+        Mockito.`when`(roleRepository.findById(roleId))
+            .thenReturn(Optional.of(Role(roleId, "description")))
+
+        Mockito.`when`(roleRepository.save(Mockito.any(Role::class.java)))
+            .thenAnswer { invocation -> invocation.arguments[0] }
 
         RestAssuredMockMvc.given()
+            .contentType("application/json")
+            .body(updatedRole)
             .mockMvc(mockMvc)
             .standaloneSetup(RoleController(roleRepository, permissionRepository))
             .`when`()
-            .get("/roles/")
+            .put("/roles/{id}", roleId)
             .then()
             .statusCode(200)
             .contentType("application/json")
-            .assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("getAllRolesContract.json"))
+            .assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("singleRoleContract.json"))
     }
 }
