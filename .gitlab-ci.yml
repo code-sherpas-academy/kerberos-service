@@ -16,6 +16,10 @@ image: gradle:alpine
 # isolated from any previous builds.
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  POSTGRES_DB: kerberos
+  POSTGRES_USER: compose-postgres
+  POSTGRES_PASSWORD: compose-postgres
+  POSTGRES_HOST_AUTH_METHOD: trust
 
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
@@ -35,12 +39,15 @@ build:
 
 test:
   stage: test
-  script: gradle check
+  script: gradle check -PspringProfiles=test
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
     paths:
       - build
       - .gradle
+  services:
+    - postgres:14.5
+
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
