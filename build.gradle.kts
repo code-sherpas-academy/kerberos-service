@@ -23,7 +23,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-	runtimeOnly("com.h2database:h2")
+	runtimeOnly("org.postgresql:postgresql:42.5.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.rest-assured:rest-assured:5.1.1")
 	testImplementation("io.rest-assured:xml-path:5.1.1")
@@ -45,4 +45,5 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	if (project.properties["springProfiles"] != null) systemProperty("spring.profiles.active", project.properties["springProfiles"]!!)
 }

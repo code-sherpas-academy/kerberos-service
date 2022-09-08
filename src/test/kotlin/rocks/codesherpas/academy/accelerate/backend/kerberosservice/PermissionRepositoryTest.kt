@@ -4,11 +4,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class PermissionRepositoryTest(@Autowired private val permissionRepository: PermissionRepository) {
 
     private lateinit var id: String

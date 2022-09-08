@@ -4,11 +4,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RoleRepositoryTest(@Autowired private val roleRepository: RoleRepository) {
     private lateinit var id: String
     private lateinit var role: Role
