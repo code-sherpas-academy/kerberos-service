@@ -1,19 +1,6 @@
 version: '3.9'
 
 services:
-#  kerberos-service:
-#    image: 'kerberos-service:latest'
-#    build:
-#      context: .
-#    container_name: kerberos-service
-#    depends_on:
-#      - db
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/compose-postgres
-#      - SPRING_DATASOURCE_USERNAME=compose-postgres
-#      - SPRING_DATASOURCE_PASSWORD=compose-postgres
-#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-
   postgres:
     image: postgres:14.4
     container_name: postgres

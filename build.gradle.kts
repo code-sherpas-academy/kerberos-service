@@ -45,5 +45,4 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
-	if (project.properties["springProfiles"] != null) systemProperty("spring.profiles.active", project.properties["springProfiles"]!!)
 }

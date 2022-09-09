@@ -1,28 +1,8 @@
 spring:
-  config:
-    activate:
-      on-profile: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: compose-postgres
-    password: compose-postgres
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: create-drop
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    url: jdbc:postgresql://postgres:5432/postgres
-    username: compose-postgres
-    password: compose-postgres
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${POSTGRES_DB:kerberos}
+    username: ${POSTGRES_USER:compose-postgres}
+    password: ${POSTGRES_PASSWORD:compose-postgres}
   jpa:
     properties:
       hibernate:
