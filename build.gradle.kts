@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "2.7.2"
 	id("io.spring.dependency-management") version "1.0.12.RELEASE"
+	id("org.flywaydb.flyway") version "9.1.2"
 	kotlin("jvm") version "1.6.21"
 	kotlin("plugin.spring") version "1.6.21"
 	kotlin("plugin.jpa") version "1.6.21"
@@ -45,4 +46,17 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+flyway {
+	val databaseHost = System.getenv("DATABASE_HOST") ?: "localhost"
+	val databasePort = System.getenv("DATABASE_PORT") ?: "5432"
+	val databaseName = System.getenv("DATABASE_NAME") ?: "kerberos"
+
+	url = "jdbc:postgresql://$databaseHost:$databasePort/$databaseName"
+	user = System.getenv("POSTGRES_USER") ?: "compose-postgres"
+	password= System.getenv("POSTGRES_PASSWORD") ?: "compose-postgres"
+	defaultSchema = "public"
+	schemas = arrayOf(defaultSchema)
+	cleanDisabled = false
 }
