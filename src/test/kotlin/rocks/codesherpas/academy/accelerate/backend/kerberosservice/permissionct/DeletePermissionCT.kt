@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepositoryJPA
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class DeletePermissionCT(
-    @Autowired val permissionRepository: PermissionRepository,
+    @Autowired val permissionRepository: PermissionRepositoryJPA,
     @LocalServerPort val port: Int
 ) {
     private val permissionId = "123"
@@ -25,7 +25,7 @@ class DeletePermissionCT(
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
-        permissionRepository.save(Permission(permissionId, "A description"))
+        permissionRepository.save(PermissionJPA(permissionId, "A description"))
     }
 
     @Test

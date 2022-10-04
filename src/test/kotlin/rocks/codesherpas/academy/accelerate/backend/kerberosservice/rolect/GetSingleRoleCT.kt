@@ -13,15 +13,15 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepositoryJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepositoryJPA
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GetSingleRoleCT(
-    @Autowired val roleRepository: RoleRepository,
-    @Autowired val permissionRepository: PermissionRepository,
+    @Autowired val roleRepository: RoleRepositoryJPA,
+    @Autowired val permissionRepository: PermissionRepositoryJPA,
     @LocalServerPort val port: Int
 ) {
 
@@ -50,8 +50,8 @@ class GetSingleRoleCT(
         roleRepository.deleteAll()
         permissionRepository.deleteAll()
 
-        val role = Role(roleId, roleDescription)
-        val permission = Permission(permissionId, permissionDescription)
+        val role = RoleJPA(roleId, roleDescription)
+        val permission = PermissionJPA(permissionId, permissionDescription)
         permissionRepository.save(permission)
         role.permissions.add(permission)
 

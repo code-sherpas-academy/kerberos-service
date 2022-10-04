@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepositoryJPA
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PutRoleCT(
-    @Autowired val roleRepository: RoleRepository,
+    @Autowired val roleRepository: RoleRepositoryJPA,
     @LocalServerPort val port: Int
 ) {
 
@@ -40,7 +40,7 @@ class PutRoleCT(
 
         roleRepository.deleteAll()
 
-        roleRepository.save(Role(roleId, "Initial description"))
+        roleRepository.save(RoleJPA(roleId, "Initial description"))
     }
 
     @AfterEach

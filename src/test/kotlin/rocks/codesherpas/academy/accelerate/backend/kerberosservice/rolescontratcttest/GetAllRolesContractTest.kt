@@ -10,18 +10,50 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleController
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.*
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.*
 
 @WebMvcTest
 class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
 
     @MockBean
-    lateinit var permissionRepository: PermissionRepository
+    lateinit var permissionRepository: PermissionRepositoryJPA
+
     @MockBean
-    lateinit var roleRepository: RoleRepository
+    lateinit var roleRepository: RoleRepositoryJPA
+
+    @MockBean
+    lateinit var assignPermissionToRole: AssignPermissionToRole
+
+    @MockBean
+    lateinit var getAllRoles: GetAllRoles
+
+    @MockBean
+    lateinit var getRoleById: GetRoleById
+
+    @MockBean
+    lateinit var updateRole: UpdateRole
+
+    @MockBean
+    lateinit var deleteRole: DeleteRole
+
+    @MockBean
+    lateinit var createRole: CreateRole
+
+    @MockBean
+    lateinit var getPermissionById: GetPermissionById
+
+    @MockBean
+    lateinit var createPermission: CreatePermission
+
+    @MockBean
+    lateinit var getAllPermissions: GetAllPermissions
+
+    @MockBean
+    lateinit var deletePermission: DeletePermission
+
+    @MockBean
+    lateinit var updatePermission: UpdatePermission
 
     @BeforeEach
     fun setUp() {
@@ -32,13 +64,23 @@ class GetAllRolesContractTest(@Autowired val mockMvc: MockMvc) {
     fun getAllRoles() {
         Mockito.`when`(roleRepository.findAll())
             .thenReturn(listOf(
-                Role("123", "description1"),
-                Role("345", "description2")
+                RoleJPA("123", "description1"),
+                RoleJPA("345", "description2")
             ))
 
         RestAssuredMockMvc.given()
             .mockMvc(mockMvc)
-            .standaloneSetup(RoleController(roleRepository, permissionRepository))
+            .standaloneSetup(
+                RoleController(
+                    assignPermissionToRole,
+                    getAllRoles,
+                    getRoleById,
+                    updateRole,
+                    deleteRole,
+                    createRole,
+                    getPermissionById,
+                )
+            )
             .`when`()
             .get("/roles/")
             .then()

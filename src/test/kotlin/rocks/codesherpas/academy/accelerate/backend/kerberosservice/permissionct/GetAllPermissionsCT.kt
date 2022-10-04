@@ -12,12 +12,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepositoryJPA
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GetAllPermissionsCT(
-    @Autowired val permissionRepository: PermissionRepository,
+    @Autowired val permissionRepository: PermissionRepositoryJPA,
     @LocalServerPort val port: Int
 ) {
 
@@ -45,7 +45,7 @@ class GetAllPermissionsCT(
 
         permissionRepository.deleteAll()
 
-        val permissions = listOf(Permission(permissionId1, description1), Permission(permissionId2, description2))
+        val permissions = listOf(PermissionJPA(permissionId1, description1), PermissionJPA(permissionId2, description2))
         permissionRepository.saveAll(permissions)
     }
 

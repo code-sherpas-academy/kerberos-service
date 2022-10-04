@@ -6,20 +6,20 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepositoryJPA
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class PermissionRepositoryTest(@Autowired private val permissionRepository: PermissionRepository) {
+class PermissionRepositoryTest(@Autowired private val permissionRepository: PermissionRepositoryJPA) {
 
     private lateinit var id: String
-    private lateinit var permission: Permission
+    private lateinit var permission: PermissionJPA
 
     @BeforeEach
     fun setUp() {
         id = "123"
-        permission = Permission(id, "description")
+        permission = PermissionJPA(id, "description")
         permissionRepository.save(permission)
     }
 
@@ -35,8 +35,8 @@ class PermissionRepositoryTest(@Autowired private val permissionRepository: Perm
         val previousPermissions = permissionRepository.findAll()
 
         val savedPermissions = listOf(
-            Permission("1", "Permission 1"),
-            Permission("2", "Permission 2")
+            PermissionJPA("1", "Permission 1"),
+            PermissionJPA("2", "Permission 2")
         )
 
         permissionRepository.saveAll(savedPermissions)
@@ -50,7 +50,7 @@ class PermissionRepositoryTest(@Autowired private val permissionRepository: Perm
 
     @Test
     fun `saves a permission`() {
-        val permissionToBeSaved = Permission(id + "4", "A permission")
+        val permissionToBeSaved = PermissionJPA(id + "4", "A permission")
         val searchedPermission = permissionRepository.findById(permissionToBeSaved.id)
         assertThat(searchedPermission.isEmpty).isTrue
 
