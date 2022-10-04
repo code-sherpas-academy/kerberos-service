@@ -2,48 +2,38 @@ package rocks.codesherpas.academy.accelerate.backend.kerberosservice.role
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.GetPermissionById
 import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionResourceWithId
-import java.util.*
 
 @RestController
 class RoleController(
-    private val roleRepository: RoleRepository,
-    private val permissionRepository: PermissionRepository
+    private val assignPermissionToRole: AssignPermissionToRole,
+    private val getAllRoles: GetAllRoles,
+    private val getRoleById: GetRoleById,
+    private val updateRole: UpdateRole,
+    private val deleteRole: DeleteRole,
+    private val createRole: CreateRole,
+    private val getPermissionById: GetPermissionById
 ) {
 
     @PostMapping("/roles")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody roleResource: RoleResource): RoleResourceWithId {
-        val createdRole = Role(UUID.randomUUID().toString(), roleResource.description)
+        val permissionIds = roleResource.permissions.map { it.id }
+        val savedRole = createRole.execute(roleResource.description, permissionIds)
+        val permissions = getPermissionResources(savedRole)
 
-        val permissions = roleResource.permissions.map {
-            val fetchedPermission = permissionRepository.findById(it.id)
-
-            if (fetchedPermission.isPresent) {
-                fetchedPermission.get()
-            } else {
-                val createdPermission = Permission(it.id, it.description)
-                permissionRepository.save(createdPermission)
-            }
-        }
-
-        createdRole.permissions += permissions
-
-        val savedRole = roleRepository.save(createdRole)
-        val permissionsToBeReturned = savedRole.permissions.map { PermissionResourceWithId(it.id, it.description) }
-        return RoleResourceWithId(savedRole.id, savedRole.description, permissionsToBeReturned)
+        return RoleResourceWithId(savedRole.id, savedRole.description, permissions)
     }
 
     @GetMapping("/roles/{id}")
     fun getOne(@PathVariable("id") id: String): RoleResourceWithId {
-        val searchedRole = roleRepository.findById(id)
+        val searchedRole = getRoleById.execute(id)
 
-        return if (searchedRole.isPresent) {
-            val foundRole = searchedRole.get()
-            val permissions = foundRole.permissions.map { PermissionResourceWithId(it.id, it.description) }
-            RoleResourceWithId(foundRole.id, foundRole.description, permissions)
+        return if (searchedRole != null) {
+            val permissions = getPermissionResources(searchedRole)
+
+            RoleResourceWithId(searchedRole.id, searchedRole.description, permissions)
         } else {
             throw Exception("No role with id: $id")
             // throw http exception ("No role with id: $id", HttpStatus.NOT_FOUND)
@@ -52,8 +42,8 @@ class RoleController(
 
     @GetMapping("/roles")
     fun getAll(): List<RoleResourceWithId> {
-        return roleRepository.findAll().map { role ->
-            val permissions = role.permissions.map { PermissionResourceWithId(it.id, it.description) }
+        return getAllRoles.execute().map { role ->
+            val permissions = getPermissionResources(role)
             RoleResourceWithId(role.id, role.description, permissions)
         }
     }
@@ -61,14 +51,7 @@ class RoleController(
     @DeleteMapping("roles/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable("id") id: String) {
-        val roleToBeDeleted = roleRepository.findById(id)
-
-        if (roleToBeDeleted.isPresent){
-            roleRepository.deleteById(id)
-        } else {
-            throw Exception("No role with id: $id")
-            // throw http exception ("No role with id: $id", HttpStatus.NOT_FOUND)
-        }
+        deleteRole.execute(id)
     }
 
     @PutMapping("/roles/{id}")
@@ -76,30 +59,25 @@ class RoleController(
         @RequestBody roleResource: RoleResource,
         @PathVariable("id") id: String
     ): RoleResourceWithId {
-        val roleToBeUpdated = roleRepository.findById(id)
+        val updatedRole = updateRole.execute(id, roleResource.description)
+        val permissions = getPermissionResources(updatedRole)
 
-        return if (roleToBeUpdated.isPresent) {
-            val updatedRole = Role(id, roleResource.description)
+        return RoleResourceWithId(updatedRole.id, updatedRole.description, permissions)
+    }
 
-            val permissions = roleResource.permissions.map {
-                val fetchedPermission = permissionRepository.findById(it.id)
+    @PostMapping("/roles/{roleId}/add-permission/{permissionId}")
+    fun addPermission(
+        @PathVariable("roleId") roleId: String,
+        @PathVariable("permissionId") permissionId: String
+    ) {
+        assignPermissionToRole.execute(roleId, permissionId)
+    }
 
-                if (fetchedPermission.isPresent) {
-                    fetchedPermission.get()
-                } else {
-                    val createdPermission = Permission(it.id, it.description)
-                    permissionRepository.save(createdPermission)
-                }
-            }
-
-            updatedRole.permissions += permissions
-
-            val savedRole = roleRepository.save(updatedRole)
-            val permissionsToBeReturned = savedRole.permissions.map { PermissionResourceWithId(it.id, it.description) }
-            RoleResourceWithId(savedRole.id, savedRole.description, permissionsToBeReturned)
-        } else {
-            throw Exception("No role with id: $id")
-            // throw http exception ("No role with id: $id", HttpStatus.NOT_FOUND)
+    private fun getPermissionResources(role: Role): List<PermissionResourceWithId> {
+        return role.permissions.map {
+            val permission = getPermissionById.execute(it)
+            if (permission === null) throw Exception("No permission with Id $it")
+            PermissionResourceWithId(permission.id, permission.description)
         }
     }
 }

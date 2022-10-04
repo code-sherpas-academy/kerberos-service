@@ -12,16 +12,16 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepositoryJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepositoryJPA
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GetAllRolesCT(
     @Autowired
-    val roleRepository: RoleRepository,
+    val roleRepository: RoleRepositoryJPA,
     @Autowired
-    val permissionRepository: PermissionRepository,
+    val permissionRepository: PermissionRepositoryJPA,
     @LocalServerPort
     val port: Int
 ) {
@@ -50,7 +50,7 @@ class GetAllRolesCT(
 
         roleRepository.deleteAll()
 
-        val roles = listOf(Role(roleId1, roleDescription1), Role(roleId2, roleDescription2))
+        val roles = listOf(RoleJPA(roleId1, roleDescription1), RoleJPA(roleId2, roleDescription2))
         roleRepository.saveAll(roles)
     }
 

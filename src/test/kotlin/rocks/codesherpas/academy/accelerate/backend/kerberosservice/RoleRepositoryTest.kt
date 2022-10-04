@@ -6,19 +6,19 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.Role
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepositoryJPA
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class RoleRepositoryTest(@Autowired private val roleRepository: RoleRepository) {
+class RoleRepositoryTest(@Autowired private val roleRepository: RoleRepositoryJPA) {
     private lateinit var id: String
-    private lateinit var role: Role
+    private lateinit var role: RoleJPA
 
     @BeforeEach
     fun setUp() {
         id = "1234"
-        role = Role(id, "A role")
+        role = RoleJPA(id, "A role")
         roleRepository.save(role)
     }
 
@@ -34,8 +34,8 @@ class RoleRepositoryTest(@Autowired private val roleRepository: RoleRepository) 
         val previousRoles = roleRepository.findAll()
 
         val savedRoles = listOf(
-            Role("1", "Role 1"),
-            Role("2", "Role 2")
+            RoleJPA("1", "Role 1"),
+            RoleJPA("2", "Role 2")
         )
 
         roleRepository.saveAll(savedRoles)
@@ -49,7 +49,7 @@ class RoleRepositoryTest(@Autowired private val roleRepository: RoleRepository) 
 
     @Test
     fun `saves a role`() {
-        val roleToBeSaved = Role(id + "4", "A role")
+        val roleToBeSaved = RoleJPA(id + "4", "A role")
         val searchedRole = roleRepository.findById(roleToBeSaved.id)
         assertThat(searchedRole.isEmpty).isTrue
 

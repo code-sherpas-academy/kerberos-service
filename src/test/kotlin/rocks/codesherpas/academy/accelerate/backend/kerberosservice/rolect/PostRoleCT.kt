@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepositoryJPA
 import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PostRoleCT(
     @LocalServerPort val port:Int,
-    @Autowired val roleRepository: RoleRepository
+    @Autowired val roleRepository: RoleRepositoryJPA
 ) {
 
     private final val uuid: UUID = UUID.randomUUID()

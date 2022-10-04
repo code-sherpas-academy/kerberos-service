@@ -12,12 +12,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionJPA
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepositoryJPA
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GetSinglePermissionCT(
-    @Autowired val permissionRepository: PermissionRepository,
+    @Autowired val permissionRepository: PermissionRepositoryJPA,
     @LocalServerPort val port: Int
 ) {
 
@@ -35,7 +35,7 @@ class GetSinglePermissionCT(
         RestAssured.port = port
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails()
 
-        permissionRepository.save(Permission(permissionId, description))
+        permissionRepository.save(PermissionJPA(permissionId, description))
     }
 
     @Test

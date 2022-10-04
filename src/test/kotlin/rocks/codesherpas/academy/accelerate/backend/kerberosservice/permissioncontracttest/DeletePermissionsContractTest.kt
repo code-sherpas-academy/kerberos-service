@@ -9,19 +9,53 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.Permission
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionRepository
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.PermissionsController
-import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.RoleRepository
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission.*
+import rocks.codesherpas.academy.accelerate.backend.kerberosservice.role.*
 import java.util.*
 
 @WebMvcTest
 class DeletePermissionsContractTest(@Autowired val mockMvc: MockMvc) {
 
     @MockBean
-    lateinit var permissionRepository: PermissionRepository
+    lateinit var permissionRepository: PermissionRepositoryJPA
+
     @MockBean
-    lateinit var roleRepository: RoleRepository
+    lateinit var roleRepository: RoleRepositoryJPA
+
+    // Required because test failed because this Bean could not be injected to RoleController
+    // Strange because this test uses PermissionController, not RoleController
+    @MockBean
+    lateinit var assignPermissionToRole: AssignPermissionToRole
+
+    @MockBean
+    lateinit var getAllRoles: GetAllRoles
+
+    @MockBean
+    lateinit var getRoleById: GetRoleById
+
+    @MockBean
+    lateinit var updateRole: UpdateRole
+
+    @MockBean
+    lateinit var deleteRole: DeleteRole
+
+    @MockBean
+    lateinit var createRole: CreateRole
+
+    @MockBean
+    lateinit var getPermissionById: GetPermissionById
+
+    @MockBean
+    lateinit var createPermission: CreatePermission
+
+    @MockBean
+    lateinit var getAllPermissions: GetAllPermissions
+
+    @MockBean
+    lateinit var deletePermission: DeletePermission
+
+    @MockBean
+    lateinit var updatePermission: UpdatePermission
 
     @BeforeEach
     fun setUp() {
@@ -33,11 +67,19 @@ class DeletePermissionsContractTest(@Autowired val mockMvc: MockMvc) {
         val permissionId = "123"
 
         Mockito.`when`(permissionRepository.findById(permissionId))
-            .thenReturn(Optional.of(Permission(permissionId, "description")))
+            .thenReturn(Optional.of(PermissionJPA(permissionId, "description")))
 
         RestAssuredMockMvc.given()
             .mockMvc(mockMvc)
-            .standaloneSetup(PermissionsController(permissionRepository, roleRepository))
+            .standaloneSetup(
+                PermissionsController(
+                    createPermission,
+                    getAllPermissions,
+                    getPermissionById,
+                    deletePermission,
+                    updatePermission
+                )
+            )
         .`when`()
             .delete("/permissions/{id}", permissionId)
         .then()

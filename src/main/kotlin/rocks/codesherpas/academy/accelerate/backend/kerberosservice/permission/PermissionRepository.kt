@@ -1,7 +1,8 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.permission
 
-import org.springframework.data.jpa.repository.JpaRepository
-
-interface PermissionRepository : JpaRepository<Permission, String> {
-
+interface PermissionRepository {
+    fun findById(id: String): Permission?
+    fun save(permission: Permission)
+    fun findAll(): List<Permission>
+    fun deleteById(id: String)
 }

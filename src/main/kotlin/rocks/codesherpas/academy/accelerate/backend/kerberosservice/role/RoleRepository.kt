@@ -1,7 +1,8 @@
 package rocks.codesherpas.academy.accelerate.backend.kerberosservice.role
 
-import org.springframework.data.jpa.repository.JpaRepository
-
-interface RoleRepository : JpaRepository<Role, String> {
-
+interface RoleRepository {
+    fun findById(roleId: String): Role?
+    fun save(role: Role)
+    fun findAll(): List<Role>
+    fun delete(id: String)
 }
